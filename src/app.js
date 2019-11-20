@@ -1,42 +1,33 @@
+// framework express é importado com require e depois chama a const app
 const express = require("express")
 const mongoose = require("mongoose")
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser') // converte 
 const app = express()
 
-app.all("*", function(req, res, next){
-  console.log("passamos pelo app, irruuuuuuu!!!!")
-  next()
-})
+mongoose.connect("mongodb://localhost:27017/clientes", {useNewUrlParser: true});
 
-//declara a propriedade
-mongoose.connect("mongodb://localhost:27017/reprograma", {useNewUrlParser: true});
-
-//aqui ele tenta fazer a conexao
-let db = mongoose.connection;
+const db = mongoose.connection;
 db.on("error", console.log.bind(console, "connection error:"))
 db.once("open", function(){
   console.log("conexão feita com sucesso.")
 })
 
-//rotas
-const index = require("./routes/index")
-const alunas = require("./routes/alunasRoute")
-const professoras = require("./routes/professorasRoute")
 
-//app.use(express.json());
 
+const clientes = require("./routes/clientesRoutes")
+// controla quem vai ter acesso (o *)
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  )
-  next()
-})
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    )
+    next()
+  })
+  
 
 app.use(bodyParser.json())
-app.use("/", index)
-app.use("/alunas", alunas)
-app.use("/professoras", professoras)
+
+app.use("/clientes", clientes)
 
 module.exports = app
